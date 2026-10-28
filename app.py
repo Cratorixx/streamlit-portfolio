@@ -246,15 +246,35 @@ with st.sidebar:
     st.divider()
 
     st.markdown("##### **⚙️ Display Preferences**")
+    theme_preset = st.selectbox(
+        "🎨 Theme Color Preset:",
+        [
+            "🌌 Cyber Cyan (#38BDF8)",
+            "💜 Neon Violet (#A855F7)",
+            "🌿 Emerald Matrix (#10B981)",
+            "🔶 Amber Sunset (#F59E0B)",
+            "🌸 Rose Quartz (#F43F5E)",
+            "🖌️ Custom Color Picker",
+        ],
+        help="Instantly recolors titles, metric cards, borders, active tabs, and charts!",
+    )
+    preset_map = {
+        "🌌 Cyber Cyan (#38BDF8)": "#38BDF8",
+        "💜 Neon Violet (#A855F7)": "#A855F7",
+        "🌿 Emerald Matrix (#10B981)": "#10B981",
+        "🔶 Amber Sunset (#F59E0B)": "#F59E0B",
+        "🌸 Rose Quartz (#F43F5E)": "#F43F5E",
+    }
+    default_hex = preset_map.get(theme_preset, "#38BDF8")
     accent_color = st.color_picker(
-        "Portfolio Accent Color:",
-        value="#38BDF8",
-        help="Dynamically styles custom accent banners, metric cards, and highlights across the app.",
+        "Fine-Tune Accent Color:",
+        value=default_hex,
+        help="Pick any custom hex color (close the picker popup after selecting to apply).",
     )
     recruiter_mode = st.toggle(
         "🔍 Show Technical Deep-Dives",
         value=True,
-        help="Toggles architecture snippets, LaTeX formulas, and live code previews.",
+        help="Shows/hides engineering specs, architecture code snippets, LaTeX formulas, and growth analytics across all tabs.",
     )
 
     st.divider()
@@ -296,42 +316,71 @@ with st.sidebar:
 # ---------------------------------------------------------
 # 6. AESTHETIC CUSTOM CSS (Dynamic Accent + Glassmorphic Cards)
 # ---------------------------------------------------------
+hex_clean = accent_color.lstrip("#")
+r_val, g_val, b_val = (
+    int(hex_clean[0:2], 16),
+    int(hex_clean[2:4], 16),
+    int(hex_clean[4:6], 16),
+)
+
 st.markdown(
     f"""
     <style>
+    /* Dynamic accent color on Main Title & Section Headers */
+    h1 {{
+        color: {accent_color} !important;
+        text-shadow: 0 0 24px rgba({r_val}, {g_val}, {b_val}, 0.28);
+    }}
+    h2, h3 {{
+        border-left: 4px solid {accent_color};
+        padding-left: 10px !important;
+    }}
     /* Dynamic glassmorphic metric cards */
     div[data-testid="stMetric"] {{
-        background: linear-gradient(145deg, rgba(17, 24, 39, 0.85), rgba(30, 41, 59, 0.55));
-        border: 1px solid rgba(148, 163, 184, 0.18);
-        border-top: 3px solid {accent_color};
+        background: linear-gradient(145deg, rgba({r_val}, {g_val}, {b_val}, 0.14), rgba(17, 24, 39, 0.88));
+        border: 1px solid rgba({r_val}, {g_val}, {b_val}, 0.35);
+        border-top: 4px solid {accent_color};
         padding: 14px 18px;
         border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.22);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
         transition: transform 0.2s ease, border-color 0.2s ease;
     }}
     div[data-testid="stMetric"]:hover {{
         transform: translateY(-2px);
         border-color: {accent_color};
+        box-shadow: 0 6px 24px rgba({r_val}, {g_val}, {b_val}, 0.25);
     }}
     div[data-testid="stMetricValue"] > div {{
         font-size: clamp(1.2rem, 1.7vw, 1.65rem) !important;
+        color: {accent_color} !important;
+        font-weight: 700 !important;
         white-space: normal !important;
         overflow-wrap: break-word !important;
         line-height: 1.25 !important;
     }}
+    /* Active Tab highlight */
+    button[data-baseweb="tab"][aria-selected="true"] {{
+        color: {accent_color} !important;
+        border-bottom: 3px solid {accent_color} !important;
+    }}
+    /* Progress bar fill */
+    div[data-testid="stProgress"] > div > div > div > div {{
+        background-color: {accent_color} !important;
+    }}
     /* Hero welcome callout */
     .hero-banner {{
         padding: 14px 20px;
-        border-left: 5px solid {accent_color};
-        background: linear-gradient(90deg, rgba(56, 189, 248, 0.12), rgba(17, 24, 39, 0.4));
+        border: 1px solid rgba({r_val}, {g_val}, {b_val}, 0.35);
+        border-left: 6px solid {accent_color};
+        background: linear-gradient(90deg, rgba({r_val}, {g_val}, {b_val}, 0.20), rgba(17, 24, 39, 0.5));
         border-radius: 0 10px 10px 0;
         margin-bottom: 18px;
     }}
     </style>
     <div class="hero-banner">
         <strong>✨ Welcome to Johanne Froilan T. Cando's Interactive Portfolio</strong> —
-        Engineered with <strong>40+ Streamlit components & features</strong> (<code>@st.fragment</code>,
-        <code>@st.cache_data</code>, <code>@st.dialog</code>, <code>st.column_config</code>, and custom theming).
+        Active Theme: <code>{accent_color}</code> &nbsp;|&nbsp;
+        Technical Deep-Dives: <strong>{"ON 🔍" if recruiter_mode else "OFF (Reader View) 📖"}</strong>
     </div>
     """,
     unsafe_allow_html=True,
@@ -399,6 +448,18 @@ m1.metric(label="Academic Standing", value="3rd Year BSCS", delta="CIT Universit
 m2.metric(label="Featured Systems", value="4 Complete Apps", delta="Desktop, Web, Mobile & AI")
 m3.metric(label="Core Tech Stack", value="10+ Technologies", delta="Multi-Language")
 m4.metric(label="Streamlit Features", value="40+ Components", delta="Full Utilization")
+
+if recruiter_mode:
+    st.info(
+        "🔍 **Technical Deep-Dive Mode is ON:** Showing architecture specifications, "
+        "semester growth analytics, source code snippets (`SQL`, `Python`, `Java`, `Kotlin`), "
+        "and $\\LaTeX$ regression models across all tabs."
+    )
+else:
+    st.caption(
+        "📖 **Compact Reader Mode is ON:** Technical code snippets, formulas, and growth charts are hidden. "
+        "Toggle **'🔍 Show Technical Deep-Dives'** in the sidebar to inspect them."
+    )
 
 st.divider()
 
@@ -570,15 +631,24 @@ with tab_about:
                 }
                 st.success(stage_details[selected_stage])
 
-        with st.expander("📈 View My Semester Coding & Project Growth Chart", expanded=True):
-            growth_df = pd.DataFrame(
-                {
-                    "Semester": ["Y1-S1", "Y1-S2", "Y2-S1", "Y2-S2", "Y3-S1", "Y3-S2"],
-                    "Projects Built": [1, 2, 4, 6, 9, 12],
-                    "Languages & Tools Mastered": [2, 3, 5, 7, 9, 11],
-                }
-            ).set_index("Semester")
-            st.area_chart(growth_df, height=220)
+        if recruiter_mode:
+            with st.expander("📈 View My Semester Coding & Project Growth Chart", expanded=True):
+                growth_df = pd.DataFrame(
+                    {
+                        "Semester": ["Y1-S1", "Y1-S2", "Y2-S1", "Y2-S2", "Y3-S1", "Y3-S2"],
+                        "Projects Built": [1, 2, 4, 6, 9, 12],
+                        "Languages & Tools Mastered": [2, 3, 5, 7, 9, 11],
+                    }
+                ).set_index("Semester")
+                st.area_chart(growth_df, height=220)
+            with st.expander("📐 Engineering Workflow & Conventional Commits Spec", expanded=True):
+                st.code(
+                    "# My standard Git & architecture workflow across repositories:\n"
+                    "feat(inventory): implement FEFO SQLite batch indexing query\n"
+                    "fix(ui): resolve metric card text overflow on narrow viewports\n"
+                    "chore(deploy): configure Streamlit Cloud theme and dependencies",
+                    language="bash",
+                )
 
 # =========================================================
 # TAB 2: SKILLS & COURSEWORK (Charts, Dataframe, Data Editor, st.echo)
@@ -630,6 +700,7 @@ with tab_skills:
                 if chart_type == "Bar Chart":
                     st.bar_chart(
                         filtered_skills.set_index("Skill")["Proficiency (%)"],
+                        color=accent_color,
                         height=340,
                     )
                 else:
