@@ -313,6 +313,12 @@ st.markdown(
         transform: translateY(-2px);
         border-color: {accent_color};
     }}
+    div[data-testid="stMetricValue"] > div {{
+        font-size: clamp(1.2rem, 1.7vw, 1.65rem) !important;
+        white-space: normal !important;
+        overflow-wrap: break-word !important;
+        line-height: 1.25 !important;
+    }}
     /* Hero welcome callout */
     .hero-banner {{
         padding: 14px 20px;
@@ -817,28 +823,29 @@ def render_interactive_lab_and_bot(show_formula: bool) -> None:
 
             lag_weeks = st.pills(
                 "Select Weather Lag Window:",
-                options=["1-Week Lag", "2-Week Lag", "3-Week Lag (Peak Effect)", "4-Week Lag"],
-                default="3-Week Lag (Peak Effect)",
+                options=["1-Week", "2-Week", "3-Week (Peak)", "4-Week"],
+                default="3-Week (Peak)",
             )
             lag_multiplier = {
-                "1-Week Lag": 0.75,
-                "2-Week Lag": 1.0,
-                "3-Week Lag (Peak Effect)": 1.28,
-                "4-Week Lag": 1.12,
-            }.get(lag_weeks or "3-Week Lag (Peak Effect)", 1.15)
+                "1-Week": 0.75,
+                "2-Week": 1.0,
+                "3-Week (Peak)": 1.28,
+                "4-Week": 1.12,
+            }.get(lag_weeks or "3-Week (Peak)", 1.15)
 
             estimated_cases = int(
                 max(5, (0.18 * rain_mm + 1.4 * (temp_c - 20) + 0.35 * humidity_pct) * lag_multiplier)
             )
-            risk_level = (
-                "🔴 High Outbreak Alert"
-                if estimated_cases >= 75
-                else ("🟠 Moderate Surge Watch" if estimated_cases >= 45 else "🟢 Baseline / Low Risk")
-            )
+            if estimated_cases >= 75:
+                risk_title, risk_sub, risk_color = "🔴 High Risk", "Outbreak Alert", "inverse"
+            elif estimated_cases >= 45:
+                risk_title, risk_sub, risk_color = "🟠 Moderate", "Surge Watch", "off"
+            else:
+                risk_title, risk_sub, risk_color = "🟢 Low Risk", "Baseline Normal", "normal"
 
             res_c1, res_c2 = st.columns(2)
-            res_c1.metric("Predicted Weekly Cases", f"{estimated_cases} cases", delta=lag_weeks)
-            res_c2.metric("Epidemiological Status", risk_level)
+            res_c1.metric("Predicted Weekly Cases", f"{estimated_cases} cases", delta=f"Lag: {lag_weeks}")
+            res_c2.metric("Epidemiological Status", risk_title, delta=risk_sub, delta_color=risk_color)
 
             weeks_df = pd.DataFrame(
                 {
