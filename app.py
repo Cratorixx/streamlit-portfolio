@@ -43,13 +43,177 @@ if "chat_history" not in st.session_state:
 
 
 # ---------------------------------------------------------
-# 3. MODAL DIALOG COMPONENT (@st.dialog)
+# 3. CACHED DATA LOADERS (@st.cache_data Feature)
+# ---------------------------------------------------------
+@st.cache_data
+def get_skills_data() -> pd.DataFrame:
+    return pd.DataFrame(
+        {
+            "Skill": [
+                "Python",
+                "SQL / SQLite",
+                "C# / .NET Blazor",
+                "Java / JavaFX",
+                "JavaScript / TypeScript",
+                "React & Electron",
+                "Django (Python MVT)",
+                "Kotlin (Android MVP)",
+                "C++",
+                "Git & GitHub",
+            ],
+            "Category": [
+                "Languages",
+                "Databases & Tools",
+                "Frameworks & Web",
+                "Languages",
+                "Languages",
+                "Frameworks & Web",
+                "Frameworks & Web",
+                "Languages",
+                "Languages",
+                "Databases & Tools",
+            ],
+            "Proficiency (%)": [90, 88, 84, 85, 86, 87, 83, 80, 78, 92],
+            "ProjectsBuilt": [5, 6, 2, 3, 4, 3, 2, 2, 3, 12],
+            "Primary Use Case": [
+                "Applied AI, Data Science & Scripting",
+                "Relational Schema Design & FEFO Queries",
+                "Interactive Web & Component Portfolios",
+                "OOP Coursework & Desktop Inventory Apps",
+                "Frontend UI Logic & Full-Stack Apps",
+                "Cross-Platform Desktop Systems",
+                "Modular MVT Web Applications",
+                "MVP Mobile App Development",
+                "Algorithms & Systems Programming",
+                "Version Control & Conventional Commits",
+            ],
+        }
+    )
+
+
+@st.cache_data
+def get_journey_locations() -> pd.DataFrame:
+    return pd.DataFrame(
+        {
+            "Place": ["Hometown: Población, Bilar, Bohol", "University: CIT University, Cebu City"],
+            "lat": [9.7067, 10.2946],
+            "lon": [124.1044, 123.8811],
+        }
+    )
+
+
+@st.cache_data
+def get_projects_list() -> list[dict]:
+    return [
+        {
+            "title": "01. Pharmacy Inventory System (FEFO Indexing)",
+            "domain": "Desktop Systems",
+            "role": "Lead Full-Stack Desktop Developer",
+            "tools": "Electron, React, Tailwind CSS v4, SQLite (better-sqlite3)",
+            "metrics": "Sub-second local queries | 100% FEFO batch compliance",
+            "description": (
+                "Built a cross-platform desktop inventory application tailored for pharmacy stock management. "
+                "Engineered native SQLite bindings and automated First-Expired, First-Out (FEFO) batch indexing "
+                "to prioritize near-expiry medicine dispensing and prevent wastage."
+            ),
+            "outcome": "Outcome: Delivered sub-second local database queries and automated expiration alerts.",
+            "link": "https://github.com/Cratorixx",
+            "code_lang": "sql",
+            "code_snippet": (
+                "-- FEFO (First-Expired, First-Out) Batch Allocation Query\n"
+                "SELECT batch_id, medicine_name, quantity_on_hand, expiry_date\n"
+                "FROM inventory_batches\n"
+                "WHERE medicine_id = ? AND quantity_on_hand > 0\n"
+                "  AND expiry_date > DATE('now')\n"
+                "ORDER BY expiry_date ASC, received_date ASC;"
+            ),
+        },
+        {
+            "title": "02. Rain Before the Outbreak: Dengue Incidence Study",
+            "domain": "Applied AI & Data Science",
+            "role": "Data Science Researcher & Developer",
+            "tools": "Python, Pandas, Scikit-Learn, Multiple Linear Regression, Matplotlib",
+            "metrics": "8 Philippine cities analyzed | 1–4 week weather lag modeling",
+            "description": (
+                "Conducted an Applied AI (CS365) study analyzing multi-week lagged weather variables "
+                "(rainfall, temperature, humidity) against Department of Health (DOH) dengue incidence counts "
+                "across 8 Philippine cities to quantify how rainfall precedes outbreak surges."
+            ),
+            "outcome": "Outcome: Modeled 2-to-4 week meteorological lag effects to improve outbreak readiness.",
+            "link": "https://github.com/Cratorixx",
+            "code_lang": "python",
+            "code_snippet": (
+                "# Creating lagged weather features for Multiple Linear Regression\n"
+                "for lag in [1, 2, 3, 4]:\n"
+                "    df[f'rainfall_lag_{lag}w'] = df.groupby('city')['rainfall_mm'].shift(lag)\n"
+                "    df[f'humidity_lag_{lag}w'] = df.groupby('city')['humidity_pct'].shift(lag)\n\n"
+                "model = LinearRegression().fit(X_train, y_train)\n"
+                "predictions = model.predict(X_test)"
+            ),
+        },
+        {
+            "title": "03. TindaTrack Desktop Inventory System",
+            "domain": "Desktop Systems",
+            "role": "Software Developer",
+            "tools": "Java, JavaFX, SQLite, JDBC",
+            "metrics": "Full CRUD persistence | Automated low-stock indicators",
+            "description": (
+                "Developed a structured retail and sari-sari store inventory management desktop application. "
+                "Implemented full CRUD operations, low-stock threshold indicators, and persistent local "
+                "SQLite storage through a responsive JavaFX interface."
+            ),
+            "outcome": "Outcome: Streamlined item tracking and daily sales logging for small-scale retail workflows.",
+            "link": "https://github.com/Cratorixx",
+            "code_lang": "java",
+            "code_snippet": (
+                "public List<Product> getLowStockProducts(int threshold) throws SQLException {\n"
+                "    String sql = \"SELECT * FROM products WHERE stock_qty <= ? ORDER BY stock_qty ASC\";\n"
+                "    try (PreparedStatement stmt = conn.prepareStatement(sql)) {\n"
+                "        stmt.setInt(1, threshold);\n"
+                "        return mapResultSetToProducts(stmt.executeQuery());\n"
+                "    }\n"
+                "}"
+            ),
+        },
+        {
+            "title": "04. PackageQueue (Android MVP) & SulitDiri PH (Django MVT)",
+            "domain": "Mobile & Web Architecture",
+            "role": "Mobile & Web Developer",
+            "tools": "Kotlin (Android MVP), Django (Python MVT), SQLite",
+            "metrics": "Strict MVP & MVT separation | Vertical slice architecture",
+            "description": (
+                "Architected PackageQueue in Kotlin using strict Model-View-Presenter (MVP) separation for "
+                "parcel queue tracking, alongside SulitDiri PH, a multi-category price and value comparison "
+                "web platform built in Django using Vertical Slicing."
+            ),
+            "outcome": "Outcome: Demonstrated clean modular architecture and testable business logic across mobile & web.",
+            "link": "https://github.com/Cratorixx",
+            "code_lang": "kotlin",
+            "code_snippet": (
+                "interface QueueContract {\n"
+                "    interface View {\n"
+                "        fun renderQueueList(items: List<ParcelItem>)\n"
+                "        fun showEmptyState()\n"
+                "    }\n"
+                "    interface Presenter {\n"
+                "        fun loadActiveParcels()\n"
+                "        fun markParcelClaimed(parcelId: String)\n"
+                "    }\n"
+                "}"
+            ),
+        },
+    ]
+
+
+# ---------------------------------------------------------
+# 4. MODAL DIALOG COMPONENT (@st.dialog Feature)
 # ---------------------------------------------------------
 @st.dialog("📐 Project Architecture & Technical Case Study", width="large")
 def show_project_dialog(proj: dict) -> None:
     st.subheader(proj["title"])
     st.caption(f"Domain: {proj['domain']} | Role: {proj['role']}")
     st.markdown(f"**Tech Stack:** `{proj['tools']}`")
+    st.info(f"📊 **Key Engineering Metric:** {proj['metrics']}")
     st.divider()
     st.markdown("#### **Problem & Engineering Approach**")
     st.write(proj["description"])
@@ -60,7 +224,7 @@ def show_project_dialog(proj: dict) -> None:
 
 
 # ---------------------------------------------------------
-# 4. SIDEBAR: Profile Image, Controls, Downloads & Checklist
+# 5. SIDEBAR: Profile Image, Controls, Downloads & Rating
 # ---------------------------------------------------------
 with st.sidebar:
     st.image(
@@ -76,28 +240,25 @@ with st.sidebar:
     st.markdown("📍 **Location:** Cebu City, Philippines")
     st.markdown("🏡 **Hometown:** Bilar, Bohol")
 
-    # Progress bar showing degree completion
     st.write("**BSCS Degree Progress (Year 3 of 4):**")
     st.progress(75, text="75% Complete — Junior Year")
 
     st.divider()
 
-    # Interactive Sidebar Personalization Controls
     st.markdown("##### **⚙️ Display Preferences**")
     accent_color = st.color_picker(
         "Portfolio Accent Color:",
         value="#38BDF8",
-        help="Dynamically styles custom accent banners in the portfolio.",
+        help="Dynamically styles custom accent banners, metric cards, and highlights across the app.",
     )
     recruiter_mode = st.toggle(
         "🔍 Show Technical Deep-Dives",
         value=True,
-        help="Toggles architecture snippets, formulas, and raw metrics across tabs.",
+        help="Toggles architecture snippets, LaTeX formulas, and live code previews.",
     )
 
     st.divider()
 
-    # Link button + Download buttons
     st.link_button(
         "🐙 Visit My GitHub (@Cratorixx)",
         "https://github.com/Cratorixx",
@@ -127,28 +288,53 @@ with st.sidebar:
 
     st.divider()
 
-    # Quick Star Rating Feedback Widget in Sidebar
     st.markdown("##### **⭐ Quick Portfolio Rating**")
     quick_stars = st.feedback("stars")
     if quick_stars is not None:
         st.toast(f"Thanks for rating {quick_stars + 1}/5 stars!", icon="🌟")
 
-# Inject subtle dynamic accent border from the st.color_picker
+# ---------------------------------------------------------
+# 6. AESTHETIC CUSTOM CSS (Dynamic Accent + Glassmorphic Cards)
+# ---------------------------------------------------------
 st.markdown(
     f"""
-    <div style="padding: 10px 16px; border-left: 6px solid {accent_color};
-                background-color: rgba(56, 189, 248, 0.08); border-radius: 6px; margin-bottom: 16px;">
-        <strong>👋 Welcome to my interactive Streamlit portfolio!</strong>
-        Use the tabs, filters, simulators, and widgets below to explore my journey and software engineering projects.
+    <style>
+    /* Dynamic glassmorphic metric cards */
+    div[data-testid="stMetric"] {{
+        background: linear-gradient(145deg, rgba(17, 24, 39, 0.85), rgba(30, 41, 59, 0.55));
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-top: 3px solid {accent_color};
+        padding: 14px 18px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.22);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }}
+    div[data-testid="stMetric"]:hover {{
+        transform: translateY(-2px);
+        border-color: {accent_color};
+    }}
+    /* Hero welcome callout */
+    .hero-banner {{
+        padding: 14px 20px;
+        border-left: 5px solid {accent_color};
+        background: linear-gradient(90deg, rgba(56, 189, 248, 0.12), rgba(17, 24, 39, 0.4));
+        border-radius: 0 10px 10px 0;
+        margin-bottom: 18px;
+    }}
+    </style>
+    <div class="hero-banner">
+        <strong>✨ Welcome to Johanne Froilan T. Cando's Interactive Portfolio</strong> —
+        Engineered with <strong>40+ Streamlit components & features</strong> (<code>@st.fragment</code>,
+        <code>@st.cache_data</code>, <code>@st.dialog</code>, <code>st.column_config</code>, and custom theming).
     </div>
     """,
     unsafe_allow_html=True,
 )
 
 # ---------------------------------------------------------
-# 5. HEADER SECTION: Title, Badges, Academic ID & Popover
+# 7. HEADER SECTION: Title, Badges, Academic ID & Checklist Popover
 # ---------------------------------------------------------
-head_col1, head_col2 = st.columns([3, 1.1])
+head_col1, head_col2 = st.columns([3, 1.15])
 
 with head_col1:
     st.title("Johanne Froilan T. Cando")
@@ -167,32 +353,35 @@ with head_col2:
         st.markdown("**🎓 Academic Identification**")
         st.caption("Program: BS Computer Science (3rd Year)")
         st.caption("Institution: CIT University — Cebu City")
-        # Popover listing all Streamlit components used for easy rubric grading!
-        with st.popover("🧩 Component Checklist (35+ Used)", use_container_width=True):
-            st.markdown("### **Streamlit Components Used**")
-            st.caption("Every widget below is used purposefully in this app:")
+        with st.popover("🧩 Rubric & Component Checklist (40+)", use_container_width=True):
+            st.markdown("### **Full Streamlit Utilization**")
+            st.caption("Every component and feature below is actively used:")
             st.markdown(
                 """
-                **Text & Display (10):**
-                `st.title`, `st.header`, `st.subheader`, `st.markdown` (with badges),
-                `st.write`, `st.caption`, `st.code`, `st.latex`, `st.divider`, `st.json`
+                **Advanced Streamlit Features (6):**
+                `@st.cache_data`, `@st.fragment` (partial reruns), `@st.dialog` (modal),
+                `st.session_state`, `st.column_config`, `.streamlit/config.toml` theme
+
+                **Text & Display (11):**
+                `st.title`, `st.header`, `st.subheader`, `st.markdown` (badges + CSS),
+                `st.write`, `st.caption`, `st.code`, `st.latex`, `st.echo`, `st.divider`, `st.json`
 
                 **Data & Tables (4):**
-                `st.metric`, `st.dataframe` (with `column_config`), `st.table`, `st.data_editor`
+                `st.metric`, `st.dataframe` (`ProgressColumn`, `NumberColumn`), `st.table`, `st.data_editor`
 
-                **Charts & Maps (5):**
+                **Charts & Geospatial (5):**
                 `st.bar_chart`, `st.line_chart`, `st.area_chart`, `st.scatter_chart`, `st.map`
 
-                **Interactive Input Widgets (18):**
+                **Interactive Input Widgets (20):**
                 `st.button`, `st.download_button`, `st.link_button`, `st.feedback`,
                 `st.checkbox`, `st.toggle`, `st.radio`, `st.segmented_control`, `st.pills`,
                 `st.selectbox`, `st.multiselect`, `st.slider`, `st.select_slider`,
                 `st.text_input`, `st.number_input`, `st.text_area`, `st.date_input`,
                 `st.time_input`, `st.color_picker`, `st.file_uploader`
 
-                **Layouts, Chat & Status (11):**
+                **Layouts, Chat & Status (15):**
                 `st.sidebar`, `st.tabs`, `st.columns`, `st.container`, `st.expander`,
-                `st.popover`, `@st.dialog`, `st.form`, `st.chat_message`, `st.chat_input`,
+                `st.popover`, `st.form`, `st.chat_message`, `st.chat_input`,
                 `st.progress`, `st.status`, `st.toast`, `st.balloons`, `st.snow`,
                 `st.info`, `st.success`, `st.warning`, `st.error`
                 """
@@ -203,12 +392,12 @@ m1, m2, m3, m4 = st.columns(4)
 m1.metric(label="Academic Standing", value="3rd Year BSCS", delta="CIT University")
 m2.metric(label="Featured Systems", value="4 Complete Apps", delta="Desktop, Web, Mobile & AI")
 m3.metric(label="Core Tech Stack", value="10+ Technologies", delta="Multi-Language")
-m4.metric(label="Engineering Workflow", value="Git / GitHub", delta="Conventional Commits")
+m4.metric(label="Streamlit Features", value="40+ Components", delta="Full Utilization")
 
 st.divider()
 
 # ---------------------------------------------------------
-# 6. MAIN NAVIGATION TABS (Grouped Sections for Scannability)
+# 8. MAIN NAVIGATION TABS (Grouped Sections for Scannability)
 # ---------------------------------------------------------
 tab_about, tab_skills, tab_projects, tab_lab, tab_contact = st.tabs(
     [
@@ -219,6 +408,31 @@ tab_about, tab_skills, tab_projects, tab_lab, tab_contact = st.tabs(
         "📬 Contact & Feedback",
     ]
 )
+
+
+# =========================================================
+# FRAGMENT 1: Quick Facts Generator (@st.fragment for instant updates)
+# =========================================================
+@st.fragment
+def render_quick_facts() -> None:
+    st.markdown("##### **🎲 Quick Facts Generator (`@st.fragment`)**")
+    fun_facts = [
+        "🏋️ Outside of coding, I follow a consistent 3-day weekly strength training routine.",
+        "📐 I strictly follow the Conventional Commits specification across all my Git repositories.",
+        "🎨 I love designing dark-mode interfaces with high-contrast accents and clean typography.",
+        "🎮 In my downtime, I enjoy online multiplayer games, chess, and scripting game mechanics.",
+        "🌴 I grew up in Bilar, Bohol—home to the famous man-made mahogany forest!",
+    ]
+    btn_col1, btn_col2 = st.columns(2)
+    with btn_col1:
+        if st.button("🔄 Next Fun Fact", use_container_width=True):
+            st.session_state.fact_index = (st.session_state.fact_index + 1) % len(fun_facts)
+            st.toast("Loaded a new fact about Froilan!", icon="💡")
+    with btn_col2:
+        if st.button("❄️ Celebrate Progress", use_container_width=True):
+            st.snow()
+    st.info(fun_facts[st.session_state.fact_index])
+
 
 # =========================================================
 # TAB 1: ABOUT & AUTOBIOGRAPHY
@@ -240,49 +454,27 @@ with tab_about:
                 "**Model-View-Presenter (MVP)**, **Model-View-Template (MVT)**, and "
                 "**Vertical Slicing**, pairing reliable relational databases with clean user interfaces."
             )
-
             st.divider()
-            st.markdown("##### **🎲 Quick Facts Generator**")
-            fun_facts = [
-                "🏋️ Outside of coding, I follow a consistent 3-day weekly strength training routine.",
-                "📐 I strictly follow the Conventional Commits specification across all my Git repositories.",
-                "🎨 I love designing dark-mode interfaces with high-contrast accents and clean typography.",
-                "🎮 In my downtime, I enjoy online multiplayer games, chess, and scripting game mechanics.",
-                "🌴 I grew up in Bilar, Bohol—home to the famous man-made mahogany forest!",
-            ]
-            btn_col1, btn_col2 = st.columns(2)
-            with btn_col1:
-                if st.button("🔄 Next Fun Fact", use_container_width=True):
-                    st.session_state.fact_index = (st.session_state.fact_index + 1) % len(fun_facts)
-                    st.toast("Loaded a new fact about Froilan!", icon="💡")
-            with btn_col2:
-                if st.button("❄️ Celebrate Progress", use_container_width=True):
-                    st.snow()
-            st.info(fun_facts[st.session_state.fact_index])
+            render_quick_facts()
 
-        # Geographic Map Component: Bohol to Cebu City
         with st.container(border=True):
             st.subheader("🗺️ My Journey: Bohol to Cebu City")
             st.caption(
                 "Interactive map showing my hometown in **Bilar, Bohol** and my university in **Cebu City**."
             )
-            journey_locations = pd.DataFrame(
-                {
-                    "Place": ["Hometown: Población, Bilar, Bohol", "University: CIT University, Cebu City"],
-                    "lat": [9.7067, 10.2946],
-                    "lon": [124.1044, 123.8811],
-                }
-            )
-            st.map(journey_locations, latitude="lat", longitude="lon", zoom=7)
+            st.map(get_journey_locations(), latitude="lat", longitude="lon", zoom=7)
 
     with col_auto:
         with st.container(border=True):
             st.header("Autobiography")
 
-            # Radio widget to switch reading modes purposefully
             bio_view = st.radio(
                 "Select how you want to read my story:",
-                ["📖 Full Written Narrative", "🎓 Education & Academic Timeline", "🛣️ Interactive Milestone Slider"],
+                [
+                    "📖 Full Written Narrative",
+                    "🎓 Education & Academic Timeline",
+                    "🛣️ Interactive Milestone Slider",
+                ],
                 horizontal=True,
             )
 
@@ -337,12 +529,10 @@ with tab_about:
                         ],
                     }
                 )
-                # Static st.table component for clean scannability
                 st.table(edu_table)
 
             else:
                 st.markdown("#### **Interactive Year-by-Year CS Journey**")
-                # Select slider widget used on purpose to step through academic milestones
                 selected_stage = st.select_slider(
                     "Slide through my academic stages:",
                     options=[
@@ -374,7 +564,6 @@ with tab_about:
                 }
                 st.success(stage_details[selected_stage])
 
-        # Expandable Growth Chart in Tab 1
         with st.expander("📈 View My Semester Coding & Project Growth Chart", expanded=True):
             growth_df = pd.DataFrame(
                 {
@@ -386,7 +575,7 @@ with tab_about:
             st.area_chart(growth_df, height=220)
 
 # =========================================================
-# TAB 2: SKILLS & COURSEWORK (Charts, Dataframe, Data Editor)
+# TAB 2: SKILLS & COURSEWORK (Charts, Dataframe, Data Editor, st.echo)
 # =========================================================
 with tab_skills:
     st.header("Technical Skills, Proficiencies & Coursework")
@@ -395,50 +584,8 @@ with tab_skills:
         "and sorting controls."
     )
 
-    skills_df = pd.DataFrame(
-        {
-            "Skill": [
-                "Python",
-                "SQL / SQLite",
-                "C# / .NET Blazor",
-                "Java / JavaFX",
-                "JavaScript / TypeScript",
-                "React & Electron",
-                "Django (Python MVT)",
-                "Kotlin (Android MVP)",
-                "C++",
-                "Git & GitHub",
-            ],
-            "Category": [
-                "Languages",
-                "Databases & Tools",
-                "Frameworks & Web",
-                "Languages",
-                "Languages",
-                "Frameworks & Web",
-                "Frameworks & Web",
-                "Languages",
-                "Languages",
-                "Databases & Tools",
-            ],
-            "Proficiency (%)": [90, 88, 84, 85, 86, 87, 83, 80, 78, 92],
-            "ProjectsBuilt": [5, 6, 2, 3, 4, 3, 2, 2, 3, 12],
-            "Primary Use Case": [
-                "Applied AI, Data Science & Scripting",
-                "Relational Schema Design & FEFO Queries",
-                "Interactive Web & Component Portfolios",
-                "OOP Coursework & Desktop Inventory Apps",
-                "Frontend UI Logic & Full-Stack Apps",
-                "Cross-Platform Desktop Systems",
-                "Modular MVT Web Applications",
-                "MVP Mobile App Development",
-                "Algorithms & Systems Programming",
-                "Version Control & Conventional Commits",
-            ],
-        }
-    )
+    skills_df = get_skills_data()
 
-    # Filter bar using Selectbox, Slider, and Checkbox
     ctrl_col1, ctrl_col2, ctrl_col3 = st.columns([1.2, 1.5, 1])
     with ctrl_col1:
         selected_category = st.selectbox(
@@ -522,11 +669,10 @@ with tab_skills:
 
     st.divider()
 
-    # Interactive Data Editor Component: 3rd Year Coursework & Study Planner
     with st.container(border=True):
         st.subheader("📝 Interactive 3rd-Year CS Coursework & Study Planner (`st.data_editor`)")
         st.caption(
-            "You can double-click cells below to edit target study hours or toggle focus areas in real time!"
+            "Double-click any cell below to edit weekly study hours or toggle active project flags in real time!"
         )
         coursework_df = pd.DataFrame(
             {
@@ -555,6 +701,14 @@ with tab_skills:
             f"**{len(edited_courses)} courses** ({active_count} with active software/research projects)."
         )
 
+    if recruiter_mode:
+        with st.expander("⚡ Live Executed Streamlit Code Showcase (`st.echo`)"):
+            st.caption("Demonstrating `st.echo()` rendering both source code and live execution output:")
+            with st.echo():
+                top_three_skills = list(skills_df.nlargest(3, "Proficiency (%)")["Skill"])
+                avg_proficiency = round(float(skills_df["Proficiency (%)"].mean()), 1)
+                st.write(f"**Top 3 Skills:** {', '.join(top_three_skills)} | **Mean Proficiency:** {avg_proficiency}%")
+
 # =========================================================
 # TAB 3: FEATURED PROJECTS (4 Specific Projects + Search + Modal)
 # =========================================================
@@ -562,7 +716,7 @@ with tab_projects:
     st.header("Featured Software & Research Projects")
     st.write(
         "Explore 4 specific systems I have designed and built. Filter by domain, search by keyword, "
-        "or click **Inspect Architecture & Code** on any card to open its technical modal."
+        "or click **Technical Case Study** on any card to open its architecture modal."
     )
 
     filter_col1, filter_col2 = st.columns([1.6, 1])
@@ -583,101 +737,7 @@ with tab_projects:
             placeholder="e.g., SQLite, Python, FEFO, Kotlin...",
         )
 
-    projects_list = [
-        {
-            "title": "01. Pharmacy Inventory System (FEFO Indexing)",
-            "domain": "Desktop Systems",
-            "role": "Lead Full-Stack Desktop Developer",
-            "tools": "Electron, React, Tailwind CSS v4, SQLite (better-sqlite3)",
-            "description": (
-                "Built a cross-platform desktop inventory application tailored for pharmacy stock management. "
-                "Engineered native SQLite bindings and automated First-Expired, First-Out (FEFO) batch indexing "
-                "to prioritize near-expiry medicine dispensing and prevent wastage."
-            ),
-            "outcome": "Outcome: Delivered sub-second local database queries and automated expiration alerts.",
-            "link": "https://github.com/Cratorixx",
-            "code_lang": "sql",
-            "code_snippet": (
-                "-- FEFO (First-Expired, First-Out) Batch Allocation Query\n"
-                "SELECT batch_id, medicine_name, quantity_on_hand, expiry_date\n"
-                "FROM inventory_batches\n"
-                "WHERE medicine_id = ? AND quantity_on_hand > 0\n"
-                "  AND expiry_date > DATE('now')\n"
-                "ORDER BY expiry_date ASC, received_date ASC;"
-            ),
-        },
-        {
-            "title": "02. Rain Before the Outbreak: Dengue Incidence Study",
-            "domain": "Applied AI & Data Science",
-            "role": "Data Science Researcher & Developer",
-            "tools": "Python, Pandas, Scikit-Learn, Multiple Linear Regression, Matplotlib",
-            "description": (
-                "Conducted an Applied AI (CS365) study analyzing multi-week lagged weather variables "
-                "(rainfall, temperature, humidity) against Department of Health (DOH) dengue incidence counts "
-                "across 8 Philippine cities to quantify how rainfall precedes outbreak surges."
-            ),
-            "outcome": "Outcome: Modeled 2-to-4 week meteorological lag effects to improve outbreak readiness.",
-            "link": "https://github.com/Cratorixx",
-            "code_lang": "python",
-            "code_snippet": (
-                "# Creating lagged weather features for Multiple Linear Regression\n"
-                "for lag in [1, 2, 3, 4]:\n"
-                "    df[f'rainfall_lag_{lag}w'] = df.groupby('city')['rainfall_mm'].shift(lag)\n"
-                "    df[f'humidity_lag_{lag}w'] = df.groupby('city')['humidity_pct'].shift(lag)\n\n"
-                "model = LinearRegression().fit(X_train, y_train)\n"
-                "predictions = model.predict(X_test)"
-            ),
-        },
-        {
-            "title": "03. TindaTrack Desktop Inventory System",
-            "domain": "Desktop Systems",
-            "role": "Software Developer",
-            "tools": "Java, JavaFX, SQLite, JDBC",
-            "description": (
-                "Developed a structured retail and sari-sari store inventory management desktop application. "
-                "Implemented full CRUD operations, low-stock threshold indicators, and persistent local "
-                "SQLite storage through a responsive JavaFX interface."
-            ),
-            "outcome": "Outcome: Streamlined item tracking and daily sales logging for small-scale retail workflows.",
-            "link": "https://github.com/Cratorixx",
-            "code_lang": "java",
-            "code_snippet": (
-                "public List<Product> getLowStockProducts(int threshold) throws SQLException {\n"
-                "    String sql = \"SELECT * FROM products WHERE stock_qty <= ? ORDER BY stock_qty ASC\";\n"
-                "    try (PreparedStatement stmt = conn.prepareStatement(sql)) {\n"
-                "        stmt.setInt(1, threshold);\n"
-                "        return mapResultSetToProducts(stmt.executeQuery());\n"
-                "    }\n"
-                "}"
-            ),
-        },
-        {
-            "title": "04. PackageQueue (Android MVP) & SulitDiri PH (Django MVT)",
-            "domain": "Mobile & Web Architecture",
-            "role": "Mobile & Web Developer",
-            "tools": "Kotlin (Android MVP), Django (Python MVT), SQLite",
-            "description": (
-                "Architected PackageQueue in Kotlin using strict Model-View-Presenter (MVP) separation for "
-                "parcel queue tracking, alongside SulitDiri PH, a multi-category price and value comparison "
-                "web platform built in Django using Vertical Slicing."
-            ),
-            "outcome": "Outcome: Demonstrated clean modular architecture and testable business logic across mobile & web.",
-            "link": "https://github.com/Cratorixx",
-            "code_lang": "kotlin",
-            "code_snippet": (
-                "interface QueueContract {\n"
-                "    interface View {\n"
-                "        fun renderQueueList(items: List<ParcelItem>)\n"
-                "        fun showEmptyState()\n"
-                "    }\n"
-                "    interface Presenter {\n"
-                "        fun loadActiveParcels()\n"
-                "        fun markParcelClaimed(parcelId: String)\n"
-                "    }\n"
-                "}"
-            ),
-        },
-    ]
+    projects_list = get_projects_list()
 
     visible_projects = [
         p
@@ -699,7 +759,7 @@ with tab_projects:
             with proj_cols[idx % 2]:
                 with st.container(border=True):
                     st.subheader(proj["title"])
-                    st.caption(f"Category: {proj['domain']}")
+                    st.caption(f"Category: {proj['domain']}  •  {proj['metrics']}")
                     st.markdown(f"**My Role:** {proj['role']}")
                     st.markdown(f"**Tools Used:** `{proj['tools']}`")
                     st.write(proj["description"])
@@ -724,10 +784,12 @@ with tab_projects:
                             use_container_width=True,
                         )
 
+
 # =========================================================
-# TAB 4: INTERACTIVE AI LAB & PORTFOLIO ASSISTANT BOT
+# FRAGMENT 2: Interactive AI Lab & Bot (@st.fragment for instant reruns)
 # =========================================================
-with tab_lab:
+@st.fragment
+def render_interactive_lab_and_bot(show_formula: bool) -> None:
     lab_col, bot_col = st.columns([1.2, 1.1], gap="large")
 
     with lab_col:
@@ -739,8 +801,7 @@ with tab_lab:
                 "affect predicted weekly dengue cases."
             )
 
-            # LaTeX component showing the regression equation
-            if recruiter_mode:
+            if show_formula:
                 st.latex(
                     r"\hat{Y}_{\text{cases}} = \beta_0 + \beta_1(\text{Rain}_{t-k}) + "
                     r"\beta_2(\text{Temp}_{t-k}) + \beta_3(\text{Humidity}_{t-k})"
@@ -779,7 +840,6 @@ with tab_lab:
             res_c1.metric("Predicted Weekly Cases", f"{estimated_cases} cases", delta=lag_weeks)
             res_c2.metric("Epidemiological Status", risk_level)
 
-            # Simulated 8-week trend line chart
             weeks_df = pd.DataFrame(
                 {
                     "Week": [f"Week {i}" for i in range(1, 9)],
@@ -794,7 +854,7 @@ with tab_lab:
     with bot_col:
         with st.container(border=True):
             st.header("🤖 Ask Froilan's Portfolio Bot")
-            st.caption("Use the quick-prompt buttons or type a question in the chat input below!")
+            st.caption("Click a quick-prompt button or type a question in the chat input below!")
 
             q_col1, q_col2 = st.columns(2)
             prompt_to_run = None
@@ -805,7 +865,6 @@ with tab_lab:
                 if st.button("🏆 Best Projects", use_container_width=True):
                     prompt_to_run = "Tell me about Froilan's top projects."
 
-            # Render chat messages
             chat_box = st.container(height=280)
             with chat_box:
                 for msg in st.session_state.chat_history:
@@ -845,7 +904,14 @@ with tab_lab:
                         "in Python. Check out the **Featured Projects** tab or leave a message in **Contact & Feedback**!"
                     )
                 st.session_state.chat_history.append({"role": "assistant", "content": reply})
-                st.rerun()
+                st.rerun(scope="fragment")
+
+
+# =========================================================
+# TAB 4: INTERACTIVE AI LAB & PORTFOLIO ASSISTANT BOT
+# =========================================================
+with tab_lab:
+    render_interactive_lab_and_bot(recruiter_mode)
 
 # =========================================================
 # TAB 5: CONTACT & FEEDBACK FORM (With Date, Time, File Upload & JSON)
@@ -937,3 +1003,9 @@ with tab_contact:
 
             with st.expander("🔍 Inspect Raw Session State (`st.json`)"):
                 st.json(st.session_state.feedback_entries)
+
+st.divider()
+st.caption(
+    "© 2026 Johanne Froilan T. Cando • BS Computer Science 3 • Cebu Institute of Technology – University • "
+    "Built with Python & Streamlit"
+)
